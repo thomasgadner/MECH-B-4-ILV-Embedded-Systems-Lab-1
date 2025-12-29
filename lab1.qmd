@@ -1,0 +1,154 @@
+---
+
+# **Laborrichtlinie: Nicht-blockierende Hauptschleife mit Interrupt-Routine**
+
+---
+
+## **Übersicht**
+
+In diesem Labor lernen wir, wie man eine nicht-blockierende Hauptschleife implementiert, um Töne zu erzeugen, und wie man eine Interrupt-Routine verwendet, um die abgespielte Melodie zu ändern. Die Hauptaufgabe besteht darin, die Super-Mario-Melodie abzuspielen und mithilfe eines Tasters auf die Zelda-Melodie umzuschalten. Die erzeugten Signale sollen mit einem Oszilloskop visualisiert werden.
+
+---
+
+## **Ziele**
+1. Verstehen des Konzepts einer nicht-blockierenden Hauptschleife.
+2. Erlernen der Tonerzeugung mithilfe von PWM oder GPIO-Toggling.
+3. Implementierung einer Interrupt-Service-Routine (ISR), die durch einen Taster ausgelöst wird.
+4. Visualisierung der erzeugten Signale mit einem Oszilloskop.
+
+---
+
+
+## **Vorbereitung vor dem Labor**
+1. **Theoretische Grundlagen**:
+   - Nicht-blockierende Programmiertechniken (z.B. Timer oder Zustandsmaschinen).
+   - Interrupts und deren Rolle in eingebetteten Systemen.
+   - Grundlagen der Tonerzeugung mit PWM oder GPIO-Toggling.
+   - Bedienung eines Oszilloskops zur Signalvisualisierung.
+
+2. **Musikalische Vorbereitung**:
+   - Super-Mario-Melodie: Eine Abfolge von Tönen mit spezifischen Frequenzen und Dauern.
+   - Zelda-Melodie: Eine andere Abfolge von Tönen mit unterschiedlichen Frequenzen und Dauern.
+
+---
+
+## **Laboranleitung**
+
+### **Schritt 1: Aufbau der Hardware**
+1. Verbinden Sie den Piezo-Buzzer oder Lautsprecher mit einem GPIO-Pin des Nucleo-F091 Boards (z.B., PA5).
+2. Schließen Sie den Taster an einen anderen GPIO-Pin an (z.B., PC13) und konfigurieren Sie ihn als Eingang mit Pull-Up-Widerstand.
+3. Verbinden Sie die Sonden des Oszilloskops mit dem GPIO-Pin, der den Buzzer steuert, um das Signal zu messen.
+
+---
+
+### **Schritt 2: Implementierung des Codes**
+
+#### **Teil A: Projektkonfiguration**
+1. Öffnen Sie Ihr PlatformIO-Projekt in Visual Studio Code.
+2. Bearbeiten Sie die Datei `platformio.ini`, um sicherzustellen, dass das STM32F091RC Board und das HAL-Framework korrekt konfiguriert sind:
+```ini
+[env:nucleo_f091rc]
+platform = ststm32
+board = nucleo_f091rc
+framework = stm32cube
+```
+
+#### **Teil B: Nicht-blockierende Tonerzeugung**
+1. Implementieren Sie eine Funktion `playTone(frequency, duration)`, die den GPIO-Pin bei der gewünschten Frequenz für die angegebene Dauer toggelt:
+
+```cpp
+#include "main.h"
+
+void playTone(uint32_t frequency, uint32_t duration_ms) ```cpp
+{
+    uint32_t period_us = 1000000 / frequency; // Berechnung der Periodendauer in Mikrosekunden
+    uint32_t half_period_us = period_us / 2;  // Halbperiode für das Toggeln
+    uint32_t cycles = (duration_ms * 1000) / period_us; // Anzahl der Zyklen
+
+    for (uint32_t i = 0; i < cycles; i++) {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET); // Buzzer einschalten
+        HAL_Delay(half_period_us / 1000);                  // Verzögerung
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET); // Buzzer ausschalten
+        HAL_Delay(half_period_us / 1000);                  // Verzögerung
+    }
+}
+```
+
+2. Fügen Sie die Funktion in Ihrer Hauptschleife ein, um die Super-Mario-Melodie abzuspielen. Erstellen Sie eine separate Funktion `playSuperMario()` und rufen Sie darin `playTone()` mit den Frequenzen und Dauern der Noten auf.
+
+#### **Teil C: Interrupt-Service-Routine**
+1. Konfigurieren Sie den GPIO-Pin des Tasters (z.B., PC13) als externen Interrupt.
+   - Initialisieren Sie den Pin im Setup:
+```cpp
+void MX_GPIO_Init(void) {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+
+    // Taster-Pin konfigurieren (PC13)
+    GPIO_InitStruct.Pin = GPIO_PIN_13;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    // Interrupt aktivieren
+    HAL_NVIC_SetPriority(EXTI15_10_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+}
+```
+
+2. Implementieren Sie die ISR, die ein globales Flag toggelt:
+```cpp
+volatile uint8_t currentSong = 0; // 0 = Super Mario, 1 = Zelda
+
+void EXTI15_10_IRQHandler(void) {
+    if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_13) != RESET) {
+        __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_13); // Lösche Interrupt-Flag
+        currentSong = !currentSong;           // Umschalten zwischen Melodien
+    }
+}
+```
+
+#### **Teil D: Hauptschleife**
+1. Überprüfen Sie das `currentSong`-Flag in der Hauptschleife und spielen Sie entweder die Super-Mario- oder Zelda-Melodie basierend auf seinem Wert:
+```cpp
+while (1) {
+    if (currentSong == 0) {
+        playSuperMario(); // Funktion zum Abspielen der Super-Mario-Melodie
+    } else {
+        playZelda();      // Funktion zum Abspielen der Zelda-Melodie
+    }
+}
+```
+
+---
+
+### **Schritt 3: Visualisierung der Signale mit dem Oszilloskop**
+1. Verbinden Sie eine Sonde des Oszilloskops mit dem GPIO-Pin (z.B., PA5), der den Piezo-Buzzer steuert.
+2. Stellen Sie sicher, dass das Oszilloskop korrekt konfiguriert ist:
+   - **Zeitbasis**: Wählen Sie eine geeignete Zeitbasis (z.B., Mikrosekunden), um die PWM-Signale zu sehen.
+   - **Spannungsskala**: Passen Sie die Spannungsskala an den Ausgangspegel des GPIO-Pins an.
+3. Beobachten und analysieren Sie das Signal:
+   - Überprüfen Sie die Frequenz des Signals für jede Note.
+   - Verifizieren Sie die Dauer jeder Note.
+
+---
+
+## **Zusatzaufgabe**
+1. Ändern Sie die Frequenzen und Dauern der Noten, um Ihre eigene Melodie zu erstellen.
+2. Implementieren Sie eine dritte Melodie und erweitern Sie die ISR so, dass sie zwischen drei Melodien umschaltet.
+
+---
+
+## **Abschluss**
+Nach Abschluss des Labors sollten die Studierenden:
+
+- Die Konzepte einer nicht-blockierenden Hauptschleife verstanden haben.
+- Wissen, wie man Interrupts verwendet, um externe Ereignisse zu verarbeiten.
+- In der Lage sein, Signale mit einem Oszilloskop zu visualisieren und zu analysieren.
+
+---
+
+## **Hinweise**
+- Achten Sie darauf, dass alle Verbindungen korrekt sind, um Schäden am Nucleo-F091 Board zu vermeiden.
+- Die Studierenden können das Projekt in PlatformIO kompilieren und direkt auf das Nucleo-F091 Board hoch laden.
