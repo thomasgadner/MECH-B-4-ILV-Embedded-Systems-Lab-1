@@ -6,7 +6,7 @@
 
 ## **Übersicht**
 
-n diesem Labor lernen wir, wie man eine Hauptschleife implementiert, um Töne zu erzeugen, und wie man eine Interrupt‑Routine verwendet, um die abgespielte Melodie zu ändern. Die Hauptaufgabe besteht darin, die Super‑Mario‑Melodie abzuspielen und mithilfe einer Taste auf die Underground‑Mario‑Melodie umzuschalten oder eine zusätzliche Verzögerung in die abgespielte Melodie einzufügen. Die Verzögerung sollte mit einem Oszilloskop visualisiert werden.
+In diesem Labor lernen wir, wie man eine Hauptschleife implementiert, um Töne zu erzeugen, und wie man eine Interrupt‑Routine verwendet, um die abgespielte Melodie zu ändern. Die Hauptaufgabe besteht darin, die Super‑Mario‑Melodie abzuspielen und mithilfe einer Taste auf die Underground‑Mario‑Melodie umzuschalten oder eine zusätzliche Verzögerung in die abgespielte Melodie einzufügen. Die Verzögerung sollte mit einem Oszilloskop visualisiert werden.
 
 ---
 
