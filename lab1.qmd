@@ -22,14 +22,18 @@ In diesem Labor lernen wir, wie man eine Hauptschleife implementiert, um Töne z
 
 ## **Vorbereitung vor dem Labor**
 1. **Implementierung des Hauptschleife und die Funktionen die notwendig sind eine Melodie (eine melody wird mit Tonen und Länge für jede Ton definiert) zu spielen**:
+
 Gegeben:
-   - LUT mit alle die Tönen 
-   - Mario und Mario-Underworld Melodien LUT (Tönen und Tempo)  
+
+- LUT mit alle die Tönen 
+- Mario und Mario-Underworld Melodien LUT (Tönen und Tempo)  
   
 Abgabe:
-    - Hauptschleife für spielen des Mario-Melody.
-    - Implementierung der Funktion `playMelody(uint16_t tone, uint8_t tempo)` die als input die Tone und Tempo für jede Tone nimmt und die Melody auf dem Buzzer spielt.
-    - Implementierung der Funktion `delayMicroseconds(uint32_t microSeconds)` die basierend auf `sysclock` eine Verzögerung um die gegebenen Mikrosekunden erzeugt.
+
+- Hauptschleife für spielen des Mario-Melody.
+- Implementierung der Funktion `playMelody(uint16_t tone, uint8_t tempo)` die als input die Tone und Tempo für jede Tone nimmt und die Melody auf dem Buzzer spielt.
+- Implementierung der Funktion `delayMicroseconds(uint32_t microSeconds)` die basierend auf `sysclock` eine Verzögerung um die gegebenen Mikrosekunden erzeugt.
+
 ---
 
 ## **Laboranleitung**
@@ -51,7 +55,7 @@ Abgabe:
 
 ---
 
-### **Schritt 3: Messung** (Labor)
+### **Schritt 3: Messung**
 1. Ausführungsdauer von ISR2.
 
 ---

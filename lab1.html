@@ -20,41 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -83,20 +48,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <hr>
-<section id="laborrichtlinie-nicht-blockierende-hauptschleife-mit-interrupt-routine" class="level1">
-<h1><strong>Laborrichtlinie: Nicht-blockierende Hauptschleife mit Interrupt-Routine</strong></h1>
+<section id="laborrichtlinie-hauptschleife-mit-interrupt-routine" class="level1">
+<h1><strong>Laborrichtlinie: Hauptschleife mit Interrupt-Routine</strong></h1>
 <hr>
 <section id="übersicht" class="level2">
 <h2 class="anchored" data-anchor-id="übersicht"><strong>Übersicht</strong></h2>
-<p>In diesem Labor lernen wir, wie man eine nicht-blockierende Hauptschleife implementiert, um Töne zu erzeugen, und wie man eine Interrupt-Routine verwendet, um die abgespielte Melodie zu ändern. Die Hauptaufgabe besteht darin, die Super-Mario-Melodie abzuspielen und mithilfe eines Tasters auf die Underground-Mario-Melodie umzuschalten. Die erzeugten Signale sollen mit einem Oszilloskop visualisiert werden.</p>
+<p>In diesem Labor lernen wir, wie man eine Hauptschleife implementiert, um Töne zu erzeugen, und wie man eine Interrupt‑Routine verwendet, um die abgespielte Melodie zu ändern. Die Hauptaufgabe besteht darin, die Super‑Mario‑Melodie abzuspielen und mithilfe einer Taste auf die Underground‑Mario‑Melodie umzuschalten oder eine zusätzliche Verzögerung in die abgespielte Melodie einzufügen. Die Verzögerung sollte mit einem Oszilloskop visualisiert werden.</p>
 <hr>
 </section>
 <section id="ziele" class="level2">
 <h2 class="anchored" data-anchor-id="ziele"><strong>Ziele</strong></h2>
 <ol type="1">
-<li>Verstehen des Konzepts einer nicht-blockierenden Hauptschleife.</li>
-<li>Erlernen der Tonerzeugung mithilfe von PWM oder GPIO-Toggling.</li>
+<li>Verstehen des Konzepts einer Hauptschleife.</li>
+<li>Erlernen der Tonerzeugung mithilfe von GPIO-Toggling.</li>
 <li>Implementierung einer Interrupt-Service-Routine (ISR), die durch einen Taster ausgelöst wird.</li>
+<li>Verstehen des Konzepts einer ISRs und der einfluss seines Dauer in eingebetteten Systemen.</li>
 <li>Visualisierung der erzeugten Signale mit einem Oszilloskop.</li>
 </ol>
 <hr>
@@ -104,19 +70,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="vorbereitung-vor-dem-labor" class="level2">
 <h2 class="anchored" data-anchor-id="vorbereitung-vor-dem-labor"><strong>Vorbereitung vor dem Labor</strong></h2>
 <ol type="1">
-<li><strong>Theoretische Grundlagen</strong>:
-<ul>
-<li>Nicht-blockierende Programmiertechniken (z.B. Timer oder Zustandsmaschinen).</li>
-<li>Interrupts und deren Rolle in eingebetteten Systemen.</li>
-<li>Grundlagen der Tonerzeugung mit PWM oder GPIO-Toggling.</li>
-<li>Bedienung eines Oszilloskops zur Signalvisualisierung.</li>
-</ul></li>
-<li><strong>Musikalische Vorbereitung</strong>:
-<ul>
-<li>Super-Mario-Melodie: Eine Abfolge von Tönen mit spezifischen Frequenzen und Dauern.</li>
-<li>Underground-Mario-Melodie: Eine andere Abfolge von Tönen mit unterschiedlichen Frequenzen und Dauern.</li>
-</ul></li>
+<li><strong>Implementierung des Hauptschleife und die Funktionen die notwendig sind eine Melodie (eine melody wird mit Tonen und Länge für jede Ton definiert) zu spielen</strong>:</li>
 </ol>
+<p>Gegeben:</p>
+<ul>
+<li>LUT mit alle die Tönen</li>
+<li>Mario und Mario-Underworld Melodien LUT (Tönen und Tempo)</li>
+</ul>
+<p>Abgabe:</p>
+<ul>
+<li>Hauptschleife für spielen des Mario-Melody.</li>
+<li>Implementierung der Funktion <code>playMelody(uint16_t tone, uint8_t tempo)</code> die als input die Tone und Tempo für jede Tone nimmt und die Melody auf dem Buzzer spielt.</li>
+<li>Implementierung der Funktion <code>delayMicroseconds(uint32_t microSeconds)</code> die basierend auf <code>sysclock</code> eine Verzögerung um die gegebenen Mikrosekunden erzeugt.</li>
+</ul>
 <hr>
 </section>
 <section id="laboranleitung" class="level2">
@@ -124,139 +90,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="schritt-1-aufbau-der-hardware" class="level3">
 <h3 class="anchored" data-anchor-id="schritt-1-aufbau-der-hardware"><strong>Schritt 1: Aufbau der Hardware</strong></h3>
 <ol type="1">
-<li>Verbinden Sie den Piezo-Buzzer oder Lautsprecher mit einem GPIO-Pin des Nucleo-F091 Boards (z.B., PA5).</li>
-<li>Schließen Sie den Taster an einen anderen GPIO-Pin an (z.B., PC13) und konfigurieren Sie ihn als Eingang mit Pull-Up-Widerstand.</li>
-<li>Verbinden Sie die Sonden des Oszilloskops mit dem GPIO-Pin, der den Buzzer steuert, um das Signal zu messen.</li>
+<li>Verbinden Sie den Piezo-Buzzer oder Lautsprecher mit einem GPIO-Pin des Nucleo-F091 Boards.</li>
+<li>Konfigurieren Sie die Tasten als Eingänge mit Pull-Up-Widerstand.</li>
 </ol>
 <hr>
 </section>
-<section id="schritt-2-implementierung-des-codes" class="level3">
-<h3 class="anchored" data-anchor-id="schritt-2-implementierung-des-codes"><strong>Schritt 2: Implementierung des Codes</strong></h3>
-<section id="teil-a-projektkonfiguration" class="level4">
-<h4 class="anchored" data-anchor-id="teil-a-projektkonfiguration"><strong>Teil A: Projektkonfiguration</strong></h4>
+<section id="schritt-2-implementierung-des-isr-codes" class="level3">
+<h3 class="anchored" data-anchor-id="schritt-2-implementierung-des-isr-codes"><strong>Schritt 2: Implementierung des ISR Codes</strong></h3>
 <ol type="1">
-<li>Öffnen Sie Ihr PlatformIO-Projekt in Visual Studio Code.</li>
-<li>Bearbeiten Sie die Datei <code>platformio.ini</code>, um sicherzustellen, dass das STM32F091RC Board und das HAL-Framework korrekt konfiguriert sind:</li>
-</ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[env:nucleo_f091rc]</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">platform </span><span class="ot">=</span><span class="st"> ststm32</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">board </span><span class="ot">=</span><span class="st"> nucleo_f091rc</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">framework </span><span class="ot">=</span><span class="st"> stm32cube</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="teil-b-nicht-blockierende-tonerzeugung-vor" class="level4">
-<h4 class="anchored" data-anchor-id="teil-b-nicht-blockierende-tonerzeugung-vor"><strong>Teil B: Nicht-blockierende Tonerzeugung</strong> (Vor)</h4>
-<ol type="1">
-<li>Implementieren Sie eine Funktion <code>playTone(frequency, duration)</code>, die den GPIO-Pin bei der gewünschten Frequenz für die angegebene Dauer toggelt:</li>
-</ol>
-<div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"main.h"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> playTone<span class="op">(</span><span class="dt">uint32_t</span> frequency<span class="op">,</span> <span class="dt">uint32_t</span> duration_ms<span class="op">)</span> <span class="er">```</span>cpp</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint32_t</span> period_us <span class="op">=</span> <span class="dv">1000000</span> <span class="op">/</span> frequency<span class="op">;</span> <span class="co">// Berechnung der Periodendauer in Mikrosekunden</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint32_t</span> half_period_us <span class="op">=</span> period_us <span class="op">/</span> <span class="dv">2</span><span class="op">;</span>  <span class="co">// Halbperiode für das Toggeln</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uint32_t</span> cycles <span class="op">=</span> <span class="op">(</span>duration_ms <span class="op">*</span> <span class="dv">1000</span><span class="op">)</span> <span class="op">/</span> period_us<span class="op">;</span> <span class="co">// Anzahl der Zyklen</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">uint32_t</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> cycles<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        HAL_GPIO_WritePin<span class="op">(</span>GPIOA<span class="op">,</span> GPIO_PIN_5<span class="op">,</span> GPIO_PIN_SET<span class="op">);</span> <span class="co">// Buzzer einschalten</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        HAL_Delay<span class="op">(</span>half_period_us <span class="op">/</span> <span class="dv">1000</span><span class="op">);</span>                  <span class="co">// Verzögerung</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        HAL_GPIO_WritePin<span class="op">(</span>GPIOA<span class="op">,</span> GPIO_PIN_5<span class="op">,</span> GPIO_PIN_RESET<span class="op">);</span> <span class="co">// Buzzer ausschalten</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        HAL_Delay<span class="op">(</span>half_period_us <span class="op">/</span> <span class="dv">1000</span><span class="op">);</span>                  <span class="co">// Verzögerung</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<ol start="2" type="1">
-<li>Fügen Sie die Funktion in Ihrer Hauptschleife ein, um die Super-Mario-Melodie abzuspielen. Erstellen Sie eine separate Funktion <code>playSuperMario()</code> und rufen Sie darin <code>playTone()</code> mit den Frequenzen und Dauern der Noten auf.</li>
-</ol>
-</section>
-<section id="teil-c-interrupt-service-routinelabor" class="level4">
-<h4 class="anchored" data-anchor-id="teil-c-interrupt-service-routinelabor"><strong>Teil C: Interrupt-Service-Routine</strong>(Labor)</h4>
-<ol type="1">
-<li>Konfigurieren Sie den GPIO-Pin des Tasters (z.B., PC13) als externen Interrupt.
+<li><p>Konfigurieren Sie die GPIO-Pins der Tasten als externe Interrupts.</p></li>
+<li><p>Implementieren Sie die ISRs:</p>
 <ul>
-<li>Initialisieren Sie den Pin im Setup:</li>
-</ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> MX_GPIO_Init<span class="op">(</span><span class="dt">void</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a> GPIO_InitTypeDef GPIO_InitStruct <span class="op">=</span> <span class="op">{</span><span class="dv">0</span><span class="op">};</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a> __HAL_RCC_GPIOC_CLK_ENABLE<span class="op">();</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a> <span class="co">// Taster-Pin konfigurieren (PC13)</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a> GPIO_InitStruct<span class="op">.</span>Pin <span class="op">=</span> GPIO_PIN_13<span class="op">;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a> GPIO_InitStruct<span class="op">.</span>Mode <span class="op">=</span> GPIO_MODE_IT_FALLING<span class="op">;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a> GPIO_InitStruct<span class="op">.</span>Pull <span class="op">=</span> GPIO_NOPULL<span class="op">;</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a> HAL_GPIO_Init<span class="op">(</span>GPIOC<span class="op">,</span> <span class="op">&amp;</span>GPIO_InitStruct<span class="op">);</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a> <span class="co">// Interrupt aktivieren</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a> HAL_NVIC_SetPriority<span class="op">(</span>EXTI15_10_IRQn<span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a> HAL_NVIC_EnableIRQ<span class="op">(</span>EXTI15_10_IRQn<span class="op">);</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li>Implementieren Sie die ISR, die ein globales Flag toggelt:</li>
-</ol>
-<div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">volatile</span> <span class="dt">uint8_t</span> currentSong <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// 0 = Super Mario, 1 = Underground-Mario</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> EXTI15_10_IRQHandler<span class="op">(</span><span class="dt">void</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>__HAL_GPIO_EXTI_GET_IT<span class="op">(</span>GPIO_PIN_13<span class="op">)</span> <span class="op">!=</span> RESET<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        __HAL_GPIO_EXTI_CLEAR_IT<span class="op">(</span>GPIO_PIN_13<span class="op">);</span> <span class="co">// Lösche Interrupt-Flag</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        currentSong <span class="op">=</span> <span class="op">!</span>currentSong<span class="op">;</span>           <span class="co">// Umschalten zwischen Melodien</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="teil-d-hauptschleife-labor" class="level4">
-<h4 class="anchored" data-anchor-id="teil-d-hauptschleife-labor"><strong>Teil D: Hauptschleife</strong> (Labor)</h4>
-<ol type="1">
-<li>Überprüfen Sie das <code>currentSong</code>-Flag in der Hauptschleife und spielen Sie entweder die Super-Mario- oder Underground-Mario-Melodie basierend auf seinem Wert:</li>
-</ol>
-<div class="sourceCode" id="cb5"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>currentSong <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        playSuperMario<span class="op">();</span> <span class="co">// Funktion zum Abspielen der Super-Mario-Melodie</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        playUnMario<span class="op">();</span>      <span class="co">// Funktion zum Abspielen der Underground-Mario-Melodie</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
-</section>
-</section>
-<section id="schritt-3-visualisierung-der-signale-mit-dem-oszilloskop-labor" class="level3">
-<h3 class="anchored" data-anchor-id="schritt-3-visualisierung-der-signale-mit-dem-oszilloskop-labor"><strong>Schritt 3: Visualisierung der Signale mit dem Oszilloskop</strong> (Labor)</h3>
-<ol type="1">
-<li>Verbinden Sie eine Sonde des Oszilloskops mit dem GPIO-Pin (z.B., PA5), der den Piezo-Buzzer steuert.</li>
-<li>Stellen Sie sicher, dass das Oszilloskop korrekt konfiguriert ist:
-<ul>
-<li><strong>Zeitbasis</strong>: Wählen Sie eine geeignete Zeitbasis (z.B., Mikrosekunden), um die PWM-Signale zu sehen.</li>
-<li><strong>Spannungsskala</strong>: Passen Sie die Spannungsskala an den Ausgangspegel des GPIO-Pins an.</li>
-</ul></li>
-<li>Beobachten und analysieren Sie das Signal:
-<ul>
-<li>Überprüfen Sie die Frequenz des Signals für jede Note.</li>
-<li>Verifizieren Sie die Dauer jeder Note.</li>
+<li>ISR1/Taste 1: Spielt die Underground-Mario-Melodie ab.</li>
+<li>ISR2/Taste 2: Fügt in der Super-Mario-Melodie eine Verzögerung von einer Sekunde ein.</li>
 </ul></li>
 </ol>
 <hr>
 </section>
-</section>
-<section id="zusatzaufgabe" class="level2">
-<h2 class="anchored" data-anchor-id="zusatzaufgabe"><strong>Zusatzaufgabe</strong></h2>
+<section id="schritt-3-messung-labor" class="level3">
+<h3 class="anchored" data-anchor-id="schritt-3-messung-labor"><strong>Schritt 3: Messung</strong> (Labor)</h3>
 <ol type="1">
-<li>Ändern Sie die Frequenzen und Dauern der Noten, um Ihre eigene Melodie zu erstellen.</li>
-<li>Implementieren Sie eine dritte Melodie und erweitern Sie die ISR so, dass sie zwischen drei Melodien umschaltet.</li>
+<li>Ausführungsdauer von ISR2.</li>
 </ol>
 <hr>
 </section>
-<section id="abschluss" class="level2">
-<h2 class="anchored" data-anchor-id="abschluss"><strong>Abschluss</strong></h2>
-<p>Nach Abschluss des Labors sollten die Studierenden:</p>
-<ul>
-<li>Die Konzepte einer nicht-blockierenden Hauptschleife verstanden haben.</li>
-<li>Wissen, wie man Interrupts verwendet, um externe Ereignisse zu verarbeiten.</li>
-<li>In der Lage sein, Signale mit einem Oszilloskop zu visualisieren und zu analysieren.</li>
-</ul>
-<hr>
 </section>
-<section id="hinweise" class="level2">
-<h2 class="anchored" data-anchor-id="hinweise"><strong>Hinweise</strong></h2>
-<ul>
-<li>Achten Sie darauf, dass alle Verbindungen korrekt sind, um Schäden am Nucleo-F091 Board zu vermeiden.</li>
-<li>Die Studierenden können das Projekt in PlatformIO kompilieren und direkt auf das Nucleo-F091 Board hoch laden.</li>
-</ul>
+<section id="abgabe" class="level2">
+<h2 class="anchored" data-anchor-id="abgabe"><strong>Abgabe</strong></h2>
+<ol type="1">
+<li>Spielen Sie der Super-Mario-Melodie.</li>
+<li>Verwenden Sie Taste 1, um die Melodie zu wechseln.</li>
+<li>Verwenden Sie Taste 2, um eine Verzögerung einzufügen.</li>
+<li>Zeigen Sie die Dauer von ISR2 an. Welchen Einfluss hat diese Dauer auf die Hauptschleife?</li>
+<li>Finden Sie eine Dauer für ISR2, die die Hauptschleife nicht beeinflusst, und messen Sie diese neue Dauer.</li>
+<li>Leiten Sie wichtige Erkenntnisse aus den Ergebnissen ab.</li>
+</ol>
 </section>
 </section>
 
