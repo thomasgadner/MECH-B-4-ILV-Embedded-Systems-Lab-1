@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <hr>
 <section id="übersicht" class="level2">
 <h2 class="anchored" data-anchor-id="übersicht"><strong>Übersicht</strong></h2>
-<p>In diesem Labor lernen wir, wie man eine nicht-blockierende Hauptschleife implementiert, um Töne zu erzeugen, und wie man eine Interrupt-Routine verwendet, um die abgespielte Melodie zu ändern. Die Hauptaufgabe besteht darin, die Super-Mario-Melodie abzuspielen und mithilfe eines Tasters auf die Zelda-Melodie umzuschalten. Die erzeugten Signale sollen mit einem Oszilloskop visualisiert werden.</p>
+<p>In diesem Labor lernen wir, wie man eine nicht-blockierende Hauptschleife implementiert, um Töne zu erzeugen, und wie man eine Interrupt-Routine verwendet, um die abgespielte Melodie zu ändern. Die Hauptaufgabe besteht darin, die Super-Mario-Melodie abzuspielen und mithilfe eines Tasters auf die Underground-Mario-Melodie umzuschalten. Die erzeugten Signale sollen mit einem Oszilloskop visualisiert werden.</p>
 <hr>
 </section>
 <section id="ziele" class="level2">
@@ -114,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Musikalische Vorbereitung</strong>:
 <ul>
 <li>Super-Mario-Melodie: Eine Abfolge von Tönen mit spezifischen Frequenzen und Dauern.</li>
-<li>Zelda-Melodie: Eine andere Abfolge von Tönen mit unterschiedlichen Frequenzen und Dauern.</li>
+<li>Underground-Mario-Melodie: Eine andere Abfolge von Tönen mit unterschiedlichen Frequenzen und Dauern.</li>
 </ul></li>
 </ol>
 <hr>
@@ -143,8 +143,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">board </span><span class="ot">=</span><span class="st"> nucleo_f091rc</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">framework </span><span class="ot">=</span><span class="st"> stm32cube</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="teil-b-nicht-blockierende-tonerzeugung" class="level4">
-<h4 class="anchored" data-anchor-id="teil-b-nicht-blockierende-tonerzeugung"><strong>Teil B: Nicht-blockierende Tonerzeugung</strong></h4>
+<section id="teil-b-nicht-blockierende-tonerzeugung-vor" class="level4">
+<h4 class="anchored" data-anchor-id="teil-b-nicht-blockierende-tonerzeugung-vor"><strong>Teil B: Nicht-blockierende Tonerzeugung</strong> (Vor)</h4>
 <ol type="1">
 <li>Implementieren Sie eine Funktion <code>playTone(frequency, duration)</code>, die den GPIO-Pin bei der gewünschten Frequenz für die angegebene Dauer toggelt:</li>
 </ol>
@@ -167,8 +167,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Fügen Sie die Funktion in Ihrer Hauptschleife ein, um die Super-Mario-Melodie abzuspielen. Erstellen Sie eine separate Funktion <code>playSuperMario()</code> und rufen Sie darin <code>playTone()</code> mit den Frequenzen und Dauern der Noten auf.</li>
 </ol>
 </section>
-<section id="teil-c-interrupt-service-routine" class="level4">
-<h4 class="anchored" data-anchor-id="teil-c-interrupt-service-routine"><strong>Teil C: Interrupt-Service-Routine</strong></h4>
+<section id="teil-c-interrupt-service-routinelabor" class="level4">
+<h4 class="anchored" data-anchor-id="teil-c-interrupt-service-routinelabor"><strong>Teil C: Interrupt-Service-Routine</strong>(Labor)</h4>
 <ol type="1">
 <li>Konfigurieren Sie den GPIO-Pin des Tasters (z.B., PC13) als externen Interrupt.
 <ul>
@@ -191,7 +191,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li>Implementieren Sie die ISR, die ein globales Flag toggelt:</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">volatile</span> <span class="dt">uint8_t</span> currentSong <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// 0 = Super Mario, 1 = Zelda</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">volatile</span> <span class="dt">uint8_t</span> currentSong <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// 0 = Super Mario, 1 = Underground-Mario</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> EXTI15_10_IRQHandler<span class="op">(</span><span class="dt">void</span><span class="op">)</span> <span class="op">{</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>__HAL_GPIO_EXTI_GET_IT<span class="op">(</span>GPIO_PIN_13<span class="op">)</span> <span class="op">!=</span> RESET<span class="op">)</span> <span class="op">{</span></span>
@@ -200,23 +200,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="teil-d-hauptschleife" class="level4">
-<h4 class="anchored" data-anchor-id="teil-d-hauptschleife"><strong>Teil D: Hauptschleife</strong></h4>
+<section id="teil-d-hauptschleife-labor" class="level4">
+<h4 class="anchored" data-anchor-id="teil-d-hauptschleife-labor"><strong>Teil D: Hauptschleife</strong> (Labor)</h4>
 <ol type="1">
-<li>Überprüfen Sie das <code>currentSong</code>-Flag in der Hauptschleife und spielen Sie entweder die Super-Mario- oder Zelda-Melodie basierend auf seinem Wert:</li>
+<li>Überprüfen Sie das <code>currentSong</code>-Flag in der Hauptschleife und spielen Sie entweder die Super-Mario- oder Underground-Mario-Melodie basierend auf seinem Wert:</li>
 </ol>
 <div class="sourceCode" id="cb5"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="op">(</span><span class="dv">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>currentSong <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        playSuperMario<span class="op">();</span> <span class="co">// Funktion zum Abspielen der Super-Mario-Melodie</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        playZelda<span class="op">();</span>      <span class="co">// Funktion zum Abspielen der Zelda-Melodie</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        playUnMario<span class="op">();</span>      <span class="co">// Funktion zum Abspielen der Underground-Mario-Melodie</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
 </section>
-<section id="schritt-3-visualisierung-der-signale-mit-dem-oszilloskop" class="level3">
-<h3 class="anchored" data-anchor-id="schritt-3-visualisierung-der-signale-mit-dem-oszilloskop"><strong>Schritt 3: Visualisierung der Signale mit dem Oszilloskop</strong></h3>
+<section id="schritt-3-visualisierung-der-signale-mit-dem-oszilloskop-labor" class="level3">
+<h3 class="anchored" data-anchor-id="schritt-3-visualisierung-der-signale-mit-dem-oszilloskop-labor"><strong>Schritt 3: Visualisierung der Signale mit dem Oszilloskop</strong> (Labor)</h3>
 <ol type="1">
 <li>Verbinden Sie eine Sonde des Oszilloskops mit dem GPIO-Pin (z.B., PA5), der den Piezo-Buzzer steuert.</li>
 <li>Stellen Sie sicher, dass das Oszilloskop korrekt konfiguriert ist:
@@ -243,7 +243,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="abschluss" class="level2">
 <h2 class="anchored" data-anchor-id="abschluss"><strong>Abschluss</strong></h2>
-<p>Nach Abschluss des Labors sollten die Studierenden: - Die Konzepte einer nicht-blockierenden Hauptschleife verstanden haben. - Wissen, wie man Interrupts verwendet, um externe Ereignisse zu verarbeiten. - In der Lage sein, Signale mit einem Oszilloskop zu visualisieren und zu analysieren.</p>
+<p>Nach Abschluss des Labors sollten die Studierenden:</p>
+<ul>
+<li>Die Konzepte einer nicht-blockierenden Hauptschleife verstanden haben.</li>
+<li>Wissen, wie man Interrupts verwendet, um externe Ereignisse zu verarbeiten.</li>
+<li>In der Lage sein, Signale mit einem Oszilloskop zu visualisieren und zu analysieren.</li>
+</ul>
 <hr>
 </section>
 <section id="hinweise" class="level2">
